@@ -34,15 +34,6 @@ object KafkaStreamExample {
     println("\n*******************************")
     println("\n*******************************")
 
-    //pull the latest twitter json schema and write to local file system
-    /*
-    val tweetraw = Source.fromURL("https://sunileman.s3.amazonaws.com/twitter/tweet1.json").mkString
-    val writer = new PrintWriter(new File("/tmp/tweet1.json"))
-    writer.write(tweetraw)
-    writer.close()
-    val twitterData=spark.read.json("file:///tmp/tweet1.json").toDF()
-    val twitterDataScheme=twitterData.schema
-     */
 
     val jsonStr = Source.fromURL("https://sunileman.s3.amazonaws.com/twitter/tweet1.json").mkString
     val twitterDataScheme = spark.read.json(Seq(jsonStr).toDS).toDF().schema
