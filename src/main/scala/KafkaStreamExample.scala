@@ -16,7 +16,6 @@ object KafkaStreamExample {
 
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder
-      .master("local[*]")
       .appName("Spark Kafka Structured Streaming Example")
       .getOrCreate()
 
@@ -36,12 +35,21 @@ object KafkaStreamExample {
     println("\n*******************************")
 
     //pull the latest twitter json schema and write to local file system
+    /*
     val tweetraw = Source.fromURL("https://sunileman.s3.amazonaws.com/twitter/tweet1.json").mkString
     val writer = new PrintWriter(new File("/tmp/tweet1.json"))
     writer.write(tweetraw)
     writer.close()
     val twitterData=spark.read.json("file:///tmp/tweet1.json").toDF()
     val twitterDataScheme=twitterData.schema
+     */
+
+    val jsonStr = Source.fromURL("https://sunileman.s3.amazonaws.com/twitter/tweet1.json").mkString
+    val twitterDataScheme = spark.read.json(Seq(jsonStr).toDS).toDF().schema
+
+
+
+    val broadcastSchema = spark.sparkContext.broadcast(twitterDataScheme)
 
 
     //read twitter stream
@@ -50,7 +58,7 @@ object KafkaStreamExample {
     //extract only the text field from the tweet and write to a kafka topic
     val ds = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
       .filter($"value".contains("created_at"))
-      .select(from_json($"value",schema = twitterDataScheme).as("data")).select($"data".getItem("text").alias("value"))
+      .select(from_json($"value",schema = broadcastSchema.value).as("data")).select($"data".getItem("text").alias("value"))
       .writeStream.format("kafka")
       .option("kafka.bootstrap.servers", kborkers)
       .option("topic", ktargettopic).option("checkpointLocation", "/tmp/s/checkpoint28")
