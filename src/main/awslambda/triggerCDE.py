@@ -17,9 +17,12 @@ def lambda_handler(event, context):
     passwd="YOUR-CDP-WORLOAD-PASS"
     userpasswd=user+":"+passwd
 
-    grafanaurl="https://service.cde-2sp6d49p.sunman1.a465-9q4k.cloudera.site/grafana/d/0Oq0WmQWk/instance-metrics?orgId=1&refresh=5s&var-virtual_cluster_name=etl"
-    jobsurl="\"https://9b9wwrgp.cde-2sp6d49p.sunman1.a465-9q4k.cloudera.site/dex/api/v1/jobs/testjob/run\" "
-    jobpayload="\"{\\\"overrides\\\":{\\\"spark\\\":{\\\"args\\\":[\\\"hello\\\"]}},\\\"user\\\":\\\""+user+"\\\"}\""
+    grafanaurl="<Your Grafana URL>"
+    jobsurl="\"<Your jobs url>\" "
+    #example
+    #jobpayload="\"{\\\"overrides\\\":{\\\"spark\\\":{\\\"args\\\":[\\\"hello\\\"]}},\\\"user\\\":\\\""+user+"\\\"}\""
+    jobpayloadpre="\"{\\\"overrides\\\":{\\\"spark\\\":{\\\"args\\\":[\\\""
+    jobpayloadpost="\\\"]}},\\\"user\\\":\\\""+user+"\\\"}\""
     getToken="curl -u \""+userpasswd+"\" $(echo \'"+grafanaurl+"\' | cut -d\'/\' -f1-3 | awk \'{print $1\"/gateway/authtkn/knoxtoken/api/v1/token\"}\')"
 
     print("curling to get cde token")
@@ -31,13 +34,6 @@ def lambda_handler(event, context):
     #print("Access Token: "+cde_token)
 
 
-    #build job url
-    jobsubmit="curl -b hadoop-jwt="+cde_token+" -X POST "+jobsurl+" -H \"Content-Type: application/json\" -d "+jobpayload
-
-    print("call cde for spark submit")
-    jobstream = os.popen(jobsubmit)
-    joboutput = jobstream.read()
-    print("CDE JobID: "+joboutput)
 
     # Get the object from the event and show its content type
     bucket = event['Records'][0]['s3']['bucket']['name']
@@ -47,6 +43,17 @@ def lambda_handler(event, context):
         print("CONTENT TYPE: " + response['ContentType'])
         print("bucket: "+bucket)
         print("key: "+key)
+        jobpayload=jobpayloadpre+bucket+"/"+key+jobpayloadpost
+        print("jobpayload: "+jobpayload)
+
+        #build job url
+        jobsubmit="curl -b hadoop-jwt="+cde_token+" -X POST "+jobsurl+" -H \"Content-Type: application/json\" -d "+jobpayload
+
+        print("call cde for spark submit")
+        jobstream = os.popen(jobsubmit)
+        joboutput = jobstream.read()
+        print("CDE JobID: "+joboutput)
+
         return response['ContentType']
     except Exception as e:
         print(e)
