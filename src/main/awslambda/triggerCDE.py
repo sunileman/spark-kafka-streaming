@@ -19,6 +19,9 @@ def lambda_handler(event, context):
 
     grafanaurl="<Your Grafana URL>"
     jobsurl="\"<Your jobs url>\" "
+    #grafanaurl="https://service.cde-2sp6d49p.sunman1.a465-9q4k.cloudera.site/grafana/d/0Oq0WmQWk/instance-metrics?orgId=1&refresh=5s&var-virtual_cluster_name=etl"
+    #jobsurl="\"https://9b9wwrgp.cde-2sp6d49p.sunman1.a465-9q4k.cloudera.site/dex/api/v1/jobs/testjob/run\" "
+
     #example
     #jobpayload="\"{\\\"overrides\\\":{\\\"spark\\\":{\\\"args\\\":[\\\"hello\\\"]}},\\\"user\\\":\\\""+user+"\\\"}\""
     jobpayloadpre="\"{\\\"overrides\\\":{\\\"spark\\\":{\\\"args\\\":[\\\""

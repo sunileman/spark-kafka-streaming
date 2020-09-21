@@ -19,7 +19,7 @@ object SimpleCDERun {
 
     println("\n*******************************")
     println("\n*******************************")
-    println("source topic: "+imputmessage)
+    println("source s3 file: "+imputmessage)
     println("\n*******************************")
     println("\n*******************************")
 
