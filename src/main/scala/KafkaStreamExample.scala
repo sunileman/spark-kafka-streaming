@@ -55,5 +55,7 @@ object KafkaStreamExample {
       .option("topic", ktargettopic).option("checkpointLocation", "/tmp/s/checkpoint28")
       .start().awaitTermination()
 
+
+
   }
 }

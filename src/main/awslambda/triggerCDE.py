@@ -37,6 +37,19 @@ def lambda_handler(event, context):
     #print("Access Token: "+cde_token)
 
 
+    ##example
+    ##{
+    ##  "overrides": {
+    ##    "spark": {
+    ##      "args": [
+    ##        "arg1",
+    ##        "arg2",
+    ##       "arg3"
+    ##      ]
+    ##    }
+    ##  },
+    ##  "user": "srv_cde-cbraw-job"
+    ##}
 
     # Get the object from the event and show its content type
     bucket = event['Records'][0]['s3']['bucket']['name']
@@ -50,7 +63,8 @@ def lambda_handler(event, context):
         print("jobpayload: "+jobpayload)
 
         #build job url
-        jobsubmit="curl -b hadoop-jwt="+cde_token+" -X POST "+jobsurl+" -H \"Content-Type: application/json\" -d "+jobpayload
+        jobsubmit="curl -H \"Authorization: Bearer "+cde_token+" -X POST "+jobsurl+" -H \"Content-Type: application/json\" -d "+jobpayload
+        # for v1 jobsubmit="curl -b hadoop-jwt="+cde_token+" -X POST "+jobsurl+" -H \"Content-Type: application/json\" -d "+jobpayload
 
         print("call cde for spark submit")
         jobstream = os.popen(jobsubmit)
