@@ -28,7 +28,7 @@ object KafkaSecureStreamExample {
       .config("spark.kafka.sasl.kerberos.service.name", "kafka")
       .config("spark.kafka.security.protocol", "SASL_SSL")
       .config("spark.kafka.ssl.truststore.location", "/usr/lib/jvm/java-1.8.0/jre/lib/security/cacerts")
-      .config("spark.kafka.ssl.truststore.password", "changeit")
+      //.config("spark.kafka.ssl.truststore.password", "changeit")
       .getOrCreate()
 
     import spark.implicits._
@@ -52,7 +52,7 @@ object KafkaSecureStreamExample {
       .option("startingOffsets", "latest")
       .option("kafka.sasl.kerberos.service.name", "kafka")
       .option("kafka.ssl.truststore.location", "/usr/lib/jvm/java-1.8.0/jre/lib/security/cacerts")
-      .option("spark.kafka.ssl.truststore.password", "changeit")
+      //.option("spark.kafka.ssl.truststore.password", "changeit")
       .option("kafka.security.protocol", "SASL_SSL")
       .option("failOnDataLoss", "false")
       .load()
@@ -67,7 +67,7 @@ object KafkaSecureStreamExample {
       .option("topic", ktargettopic)
       .option("kafka.sasl.kerberos.service.name", "kafka")
       .option("kafka.ssl.truststore.location", "/usr/lib/jvm/java-1.8.0/jre/lib/security/cacerts")
-      .option("spark.kafka.ssl.truststore.password", "changeit")
+      //.option("spark.kafka.ssl.truststore.password", "changeit")
       .option("kafka.security.protocol", "SASL_SSL")
       .option("checkpointLocation", "/app/mount/spark-checkpoint2")
       .start()
