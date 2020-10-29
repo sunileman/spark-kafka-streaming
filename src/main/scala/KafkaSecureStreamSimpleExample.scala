@@ -1,11 +1,9 @@
-package com.cloudera.examples
-
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
 import scala.io.Source
 
-object KafkaSecureStreamExample {
+object KafkaSecureStreamSimpleExample {
 
   def main(args: Array[String]): Unit = {
 
@@ -52,24 +50,19 @@ object KafkaSecureStreamExample {
       .option("startingOffsets", "latest")
       .option("kafka.sasl.kerberos.service.name", "kafka")
       .option("kafka.ssl.truststore.location", "/usr/lib/jvm/java-1.8.0/jre/lib/security/cacerts")
-      //.option("spark.kafka.ssl.truststore.password", "changeit")
       .option("kafka.security.protocol", "SASL_SSL")
       .option("failOnDataLoss", "false")
       .load()
 
 
-
     //extract only the text field from the tweet and write to a kafka topic
-    val ds = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
-      .filter($"value".contains("created_at"))
-      .select(from_json($"value",schema = broadcastSchema.value).as("data")).select($"data".getItem("text").alias("value"))
+    val ds = df.select("CAST(key AS STRING)", "CAST(value AS STRING)")
       .writeStream.format("kafka")
       .outputMode("update")
       .option("kafka.bootstrap.servers", kbrokers)
       .option("topic", ktargettopic)
       .option("kafka.sasl.kerberos.service.name", "kafka")
       .option("kafka.ssl.truststore.location", "/usr/lib/jvm/java-1.8.0/jre/lib/security/cacerts")
-      //.option("spark.kafka.ssl.truststore.password", "changeit")
       .option("kafka.security.protocol", "SASL_SSL")
       .option("checkpointLocation", "/app/mount/spark-checkpoint2")
       .start()
