@@ -1,5 +1,9 @@
+package com.cloudera.examples
+
+
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
+
 
 import scala.io.Source
 
@@ -26,7 +30,6 @@ object KafkaSecureStreamSimpleExample {
       .config("spark.kafka.sasl.kerberos.service.name", "kafka")
       .config("spark.kafka.security.protocol", "SASL_SSL")
       .config("spark.kafka.ssl.truststore.location", "/usr/lib/jvm/java-1.8.0/jre/lib/security/cacerts")
-      //.config("spark.kafka.ssl.truststore.password", "changeit")
       .getOrCreate()
 
     import spark.implicits._
@@ -46,8 +49,10 @@ object KafkaSecureStreamSimpleExample {
       .load()
 
 
+
+
     //extract only the text field from the tweet and write to a kafka topic
-    val ds = df.select("CAST(key AS STRING)", "CAST(value AS STRING)")
+    val ds = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
       .writeStream.format("kafka")
       .outputMode("update")
       .option("kafka.bootstrap.servers", kbrokers)
