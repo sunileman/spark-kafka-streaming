@@ -34,15 +34,6 @@ object KafkaSecureStreamSimpleExample {
     spark.sparkContext.setLogLevel("INFO")
 
 
-
-    val jsonStr = Source.fromURL("https://sunileman.s3.amazonaws.com/twitter/tweet1.json").mkString
-    val twitterDataScheme = spark.read.json(Seq(jsonStr).toDS).toDF().schema
-
-
-    val broadcastSchema = spark.sparkContext.broadcast(twitterDataScheme)
-
-
-
     //read twitter stream
     val df = spark.readStream.format("kafka")
       .option("kafka.bootstrap.servers", kbrokers)
