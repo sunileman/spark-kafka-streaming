@@ -37,7 +37,7 @@ object KafkaSecureStreamSimpleExample {
     spark.sparkContext.setLogLevel("INFO")
 
 
-    //read twitter stream
+    //read from the input kafka topic
     val df = spark.readStream.format("kafka")
       .option("kafka.bootstrap.servers", kbrokers)
       .option("subscribe", ksourcetopic)
@@ -51,7 +51,7 @@ object KafkaSecureStreamSimpleExample {
 
 
 
-    //extract only the text field from the tweet and write to a kafka topic
+    //pull the message from the input kafka topic and write back to output topic
     val ds = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
       .writeStream.format("kafka")
       .outputMode("update")
