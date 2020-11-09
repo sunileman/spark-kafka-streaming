@@ -1,1 +1,2 @@
 /src/main/resources/truststore.jks
+/src/main/resources/jaas.conf
