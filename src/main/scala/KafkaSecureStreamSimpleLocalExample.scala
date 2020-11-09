@@ -24,9 +24,9 @@ object KafkaSecureStreamSimpleLocalExample {
       .config("spark.kafka.sasl.kerberos.service.name", "kafka")
       .config("spark.kafka.security.protocol", "SASL_SSL")
       .config("kafka.sasl.mechanism", "PLAIN")
-      .config("spark.driver.extraJavaOptions", "-Djava.security.auth.login.config=/Users/sunile.manjee/Documents/Cloudera/javacode/spark-kafka-streaming/src/main/resources/jaas.conf")
-      .config("spark.executor.extraJavaOptions", "-Djava.security.auth.login.config=/Users/sunile.manjee/Documents/Cloudera/javacode/spark-kafka-streaming/src/main/resources/jaas.conf")
-      .config("spark.kafka.ssl.truststore.location", "/Users/sunile.manjee/Documents/Cloudera/javacode/spark-kafka-streaming/truststore.jks")
+      .config("spark.driver.extraJavaOptions", "-Djava.security.auth.login.config=./src/main/resources/jaas.conf")
+      .config("spark.executor.extraJavaOptions", "-Djava.security.auth.login.config=./src/main/resources/jaas.conf")
+      .config("spark.kafka.ssl.truststore.location", "./src/main/resources/truststore.jks")
       .getOrCreate()
 
     spark.sparkContext.setLogLevel("INFO")
@@ -37,7 +37,7 @@ object KafkaSecureStreamSimpleLocalExample {
       StructField("text", org.apache.spark.sql.types.StringType)
     ))
 
-    val streamingDataFrame = spark.readStream.schema(mySchema).format("csv").load("/Users/sunile.manjee/Documents/Cloudera/javacode/spark-kafka-streaming/src/main/resources/data")
+    val streamingDataFrame = spark.readStream.schema(mySchema).format("csv").load("./src/main/resources/data")
 
     val ds = streamingDataFrame.selectExpr("CAST(id AS STRING)", "CAST(text AS STRING) as value")
       .writeStream.format("kafka")
@@ -45,7 +45,7 @@ object KafkaSecureStreamSimpleLocalExample {
       .option("kafka.bootstrap.servers", kbrokers)
       .option("topic", ktargettopic)
       .option("kafka.sasl.kerberos.service.name", "kafka")
-      .option("kafka.ssl.truststore.location", "/Users/sunile.manjee/Documents/Cloudera/javacode/spark-kafka-streaming/truststore.jks")
+      .option("kafka.ssl.truststore.location", "./src/main/resources/truststore.jks")
       .option("kafka.security.protocol", "SASL_SSL")
       .option("kafka.sasl.mechanism", "PLAIN")
       //.option("checkpointLocation", "s3a://yours3bucket/datalake/sunman/spark-checkpoint2")
