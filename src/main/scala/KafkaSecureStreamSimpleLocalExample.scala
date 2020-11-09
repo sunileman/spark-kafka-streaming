@@ -6,13 +6,11 @@ object KafkaSecureStreamSimpleLocalExample {
 
   def main(args: Array[String]): Unit = {
 
-    val ksourcetopic = args(0)
-    val ktargettopic = args(1)
-    val kbrokers = args(2)
+    val ktargettopic = args(0)
+    val kbrokers = args(1)
 
     println("\n*******************************")
     println("\n*******************************")
-    println("source topic: "+ksourcetopic)
     println("target topic: "+ktargettopic)
     println("brokers: "+kbrokers)
     println("\n*******************************")
