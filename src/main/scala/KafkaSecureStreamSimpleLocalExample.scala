@@ -48,7 +48,6 @@ object KafkaSecureStreamSimpleLocalExample {
       .option("kafka.ssl.truststore.location", "./src/main/resources/truststore.jks")
       .option("kafka.security.protocol", "SASL_SSL")
       .option("kafka.sasl.mechanism", "PLAIN")
-      //.option("checkpointLocation", "s3a://yours3bucket/datalake/sunman/spark-checkpoint2")
       .option("checkpointLocation", "/tmp/spark-checkpoint2/")
       .start()
       .awaitTermination()
