@@ -1,11 +1,6 @@
 package com.cloudera.examples
 
-
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
-
-
-import scala.io.Source
+import org.apache.spark.sql.SparkSession
 
 object KafkaSecureStreamSimpleExample {
 
@@ -15,11 +10,14 @@ object KafkaSecureStreamSimpleExample {
     val ktargettopic = args(1)
     val kbrokers = args(2)
 
+    //for example s3a://goes-se-cdp-sandbox/datalake/data/sunman/spark-checkpoint2
+    val checkpointLocation = args(3)
+
     println("\n*******************************")
     println("\n*******************************")
-    println("source topic: "+ksourcetopic)
-    println("target topic: "+ktargettopic)
-    println("brokers: "+kbrokers)
+    println("source topic: " + ksourcetopic)
+    println("target topic: " + ktargettopic)
+    println("brokers: " + kbrokers)
     println("\n*******************************")
     println("\n*******************************")
 
@@ -31,8 +29,6 @@ object KafkaSecureStreamSimpleExample {
       .config("spark.kafka.security.protocol", "SASL_SSL")
       .config("spark.kafka.ssl.truststore.location", "/usr/lib/jvm/java-1.8.0/jre/lib/security/cacerts")
       .getOrCreate()
-
-    import spark.implicits._
 
     spark.sparkContext.setLogLevel("INFO")
 
@@ -49,8 +45,6 @@ object KafkaSecureStreamSimpleExample {
       .load()
 
 
-
-
     //pull the message from the input kafka topic and write back to output topic
     val ds = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
       .writeStream.format("kafka")
@@ -60,7 +54,7 @@ object KafkaSecureStreamSimpleExample {
       .option("kafka.sasl.kerberos.service.name", "kafka")
       .option("kafka.ssl.truststore.location", "/usr/lib/jvm/java-1.8.0/jre/lib/security/cacerts")
       .option("kafka.security.protocol", "SASL_SSL")
-      .option("checkpointLocation", "s3a://goes-se-cdp-sandbox/datalake/data/sunman/spark-checkpoint2")
+      .option("checkpointLocation", checkpointLocation)
       .start()
       .awaitTermination()
 
