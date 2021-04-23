@@ -1,7 +1,7 @@
 package com.cloudera.examples
 
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.from_json
 
 import scala.io.Source
 
@@ -15,9 +15,9 @@ object KafkaSecureStreamExample {
 
     println("\n*******************************")
     println("\n*******************************")
-    println("source topic: "+ksourcetopic)
-    println("target topic: "+ktargettopic)
-    println("brokers: "+kbrokers)
+    println("source topic: " + ksourcetopic)
+    println("target topic: " + ktargettopic)
+    println("brokers: " + kbrokers)
     println("\n*******************************")
     println("\n*******************************")
 
@@ -36,13 +36,11 @@ object KafkaSecureStreamExample {
     spark.sparkContext.setLogLevel("INFO")
 
 
-
     val jsonStr = Source.fromURL("https://sunileman.s3.amazonaws.com/twitter/tweet1.json").mkString
     val twitterDataScheme = spark.read.json(Seq(jsonStr).toDS).toDF().schema
 
 
     val broadcastSchema = spark.sparkContext.broadcast(twitterDataScheme)
-
 
 
     //read twitter stream
@@ -58,11 +56,10 @@ object KafkaSecureStreamExample {
       .load()
 
 
-
     //extract only the text field from the tweet and write to a kafka topic
     val ds = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
       .filter($"value".contains("created_at"))
-      .select(from_json($"value",schema = broadcastSchema.value).as("data")).select($"data".getItem("text").alias("value"))
+      .select(from_json($"value", schema = broadcastSchema.value).as("data")).select($"data".getItem("text").alias("value"))
       .writeStream.format("kafka")
       .outputMode("update")
       .option("kafka.bootstrap.servers", kbrokers)

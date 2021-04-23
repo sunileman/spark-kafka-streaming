@@ -1,10 +1,8 @@
 package com.cloudera.examples
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.streaming.Trigger
-import org.apache.spark.sql.types.StringType
 
-import scala.io.Source
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.from_json
+import org.apache.spark.sql.streaming.Trigger
 
 object KafkaStreamWriteToS3 {
 
@@ -14,8 +12,7 @@ object KafkaStreamWriteToS3 {
     val kbrokers = args(1)
     val startingOffsets = args(2) //ie latest
     val s3bucket = args(3)
-    val checkpoint = args(4)  //ie s3 bucket
-
+    val checkpoint = args(4) //ie s3 bucket
 
 
     println("\n*******************************")
@@ -23,23 +20,23 @@ object KafkaStreamWriteToS3 {
     println("\n**********INPUTS***************")
     println("\n**********INPUTS***************")
     println("\n**********INPUTS***************")
-    println("source topic: "+ksourcetopic)
-    println("brokers: "+kbrokers)
-    println("startingOffsets: "+startingOffsets)
-    println("s3bucket: "+s3bucket)
-    println("checkpoint: "+checkpoint)
+    println("source topic: " + ksourcetopic)
+    println("brokers: " + kbrokers)
+    println("startingOffsets: " + startingOffsets)
+    println("s3bucket: " + s3bucket)
+    println("checkpoint: " + checkpoint)
     println("\n*******************************")
     println("\n*******************************")
 
 
     val spark = SparkSession.builder
-      .appName("Spark Kafka Secure Structured Streaming Example")
+      .appName("Write COVID Cases to s3")
       .config("spark.kafka.bootstrap.servers", kbrokers)
       .config("spark.kafka.sasl.kerberos.service.name", "kafka")
       .config("spark.kafka.security.protocol", "SASL_SSL")
       .config("spark.kafka.sasl.mechanism", "PLAIN")
       .config("spark.kafka.ssl.truststore.location", "/usr/lib/jvm/java-1.8.0/jre/lib/security/cacerts")
-      .config("spark.sql.streaming.checkpointLocation", "/app/mount/spark-checkpoint5")
+      .config("spark.sql.streaming.checkpointLocation", checkpoint)
       .getOrCreate()
 
     spark.sparkContext.setLogLevel("INFO")
@@ -64,8 +61,6 @@ object KafkaStreamWriteToS3 {
       .option("failOnDataLoss", "false")
       .option("checkpointLocation", checkpoint)
       .load()
-
-
 
 
     dfreadstream.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")

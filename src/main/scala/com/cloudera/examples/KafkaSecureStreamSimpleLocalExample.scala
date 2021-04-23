@@ -1,6 +1,7 @@
-import org.apache.avro.generic.GenericData.StringType
-import org.apache.spark.sql._
-import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
+package com.cloudera.examples
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.types.{StructField, StructType}
 
 object KafkaSecureStreamSimpleLocalExample {
 
@@ -11,8 +12,8 @@ object KafkaSecureStreamSimpleLocalExample {
 
     println("\n*******************************")
     println("\n*******************************")
-    println("target topic: "+ktargettopic)
-    println("brokers: "+kbrokers)
+    println("target topic: " + ktargettopic)
+    println("brokers: " + kbrokers)
     println("\n*******************************")
     println("\n*******************************")
 

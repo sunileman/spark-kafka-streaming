@@ -5,13 +5,9 @@ import org.apache.spark.sql.streaming.Trigger
 import org.apache.spark.sql.types.StringType
 
 import scala.io.Source
+import com.google.common.collect.ImmutableMap
 
-//On CDE you must upload phoenixn jars
-// phoenix-spark-5.0.0.7.2.2.1-5.jar and phoenix-5.0.0.7.2.2.3-1-client.jar
-//which are found in COD edge node /opt/cloudera/parcels/CDH/jars
-//also curerntly hbase-site.xml should be wrapped inside the jar
-//you will find hbase-site.xml under the resources directory
-object KafkaStreamWithPhoenix {
+object KafkaStreamWithPhoenixPersistance {
 
   def main(args: Array[String]): Unit = {
 
@@ -21,7 +17,8 @@ object KafkaStreamWithPhoenix {
     val checkpoint = args(3)  //ie s3 bucket
     val zkUrl= args(4)
     val lookupTblName= args(5)
-    val ktargettopic = args(6)
+    val targetTable = args(6)
+
 
     /*  val ksourcetopic = "moad-covid-json"
    val kbrokers = "moad-aw-dev0-dataflow-worker0.moad-aw.yovj-8g7d.cloudera.site:9093,moad-aw-dev0-dataflow-worker2.moad-aw.yovj-8g7d.cloudera.site:9093,moad-aw-dev0-dataflow-worker1.moad-aw.yovj-8g7d.cloudera.site:9093"
@@ -117,22 +114,17 @@ object KafkaStreamWithPhoenix {
         col("lookup_data.country_name"),
         col("covid_data.latitude"),col("covid_data.longitude"),col("covid_data.confirmed"),col("covid_data.dead"))
 
-
-    val ds = finalDf.selectExpr("to_json(struct(*)) AS value")
-      .writeStream.format("kafka")
-      .outputMode("update")
-      .option("kafka.bootstrap.servers", kbrokers)
-      .option("topic", ktargettopic)
-      .option("kafka.sasl.kerberos.service.name", "kafka")
-      .option("kafka.ssl.truststore.location", "/usr/lib/jvm/java-1.8.0/jre/lib/security/cacerts")
-
-      .option("kafka.security.protocol", "SASL_SSL")
-      .option("checkpointLocation", "/app/mount/spark-checkpoint2")
+    lookupDataDf.unpersist();
 
 
 
-      .start()
-      .awaitTermination()
+    finalDf.writeStream.foreachBatch { (batchDF: DataFrame, batchId: Long) =>
+    {
+      batchDF.write.format("org.apache.phoenix.spark").mode(SaveMode.Overwrite)
+        .options(ImmutableMap.of("driver","org.apache.phoenix.jdbc.PhoenixDriver","zkUrl",zkUrl,"table",targetTable))
+        .save()
+    }
+    }.start().awaitTermination()
 
 
 
