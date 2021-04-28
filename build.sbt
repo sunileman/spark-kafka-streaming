@@ -50,11 +50,11 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-sql-kafka-0-10" % sparkVersion % "provided",
   "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
   "org.apache.spark" %% "spark-sql" % sparkVersion % "provided",
-  "org.apache.spark" %% "spark-streaming" % sparkVersion% "provided",
+  "org.apache.spark" %% "spark-streaming" % sparkVersion % "provided",
 
   //the assuming here is that user will provide the jars. If you do not have the phoenix jars remove the provided statement
-  "org.apache.phoenix" % "phoenix-spark" % phoenixVersion,
-  "org.apache.phoenix" % "phoenix-client" % phoenixVersion
+  "org.apache.phoenix" % "phoenix-spark" % phoenixVersion  % "provided",
+  "org.apache.phoenix" % "phoenix-client" % phoenixVersion  % "provided"
 
 
 
